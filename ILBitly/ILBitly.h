@@ -47,7 +47,7 @@
 
 /** Takes a long URL and returns a shortened version of it.
  
- Takes the long URL specfied in _longURLString_ and returns a shortened version of in the block specified in _result_. 
+ Takes the long URL specfied in _longURLString_ and returns a shortened version in the block specified in _result_. 
  @param longURLString The long URL string to shorten
  @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value*/
 - (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result;
@@ -60,4 +60,23 @@
  @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
 - (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result error:(void (^)(NSError*))error;
 
+/** @name Expanding URLs */
+
+/** Takes a short URL and returns an expanded version of it.
+ 
+ Takes the short URL specfied in _shortURLString_ and returns an expanded version in the block specified in _result_. 
+ @param shortURLString The short URL string to expand
+ @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value*/
+- (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result;
+
+/** Takes a short URL and returns an expanded version of it.
+ 
+ Takes the short URL specfied in _shortURLString_ and returns an expanded version in the block specified in _result_.  In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
+ @param shortURLString The short URL string to expand
+ @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value
+ @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
+- (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result error:(void (^)(NSError*))error;
+
 @end
+
+extern NSString *const kILBitlyErrorDomain;

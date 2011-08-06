@@ -13,12 +13,22 @@ For the sample project to build, you need to place AFNetworking and JSONKit insi
 ## Example Usage
 ###Shortening an URL
 	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
-	[bitly shorten:text result:^(NSString *shortURLString) {
+	[bitly shorten:@"http://www.infinite-loop.dk" result:^(NSString *shortURLString) {
 		NSLog(@"The shortened URL: %@", shortURLString);
 	} error:^(NSError *err) {
 		NSLog(@"An error occurred %@", err);
 	}];
 	[bitly release];
+
+###Expanding an URL
+	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
+	[bitly expand:@"http://j.mp/its-your-round" result:^(NSString *longURLString) {
+		NSLog(@"The expanded URL: %@", longURLString);
+	} error:^(NSError *err) {
+		NSLog(@"An error occurred %@", err);
+	}];
+	[bitly release];
+
 
 See more examples in the attached sample project.
 

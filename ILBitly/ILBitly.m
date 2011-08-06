@@ -28,11 +28,15 @@
 #import "ILBitly.h"
 #import "AFJSONRequestOperation.h"
 
+NSString *const kILBitlyErrorDomain = @"ILBitlyErrorDomain";
+
 static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&format=json";
+static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&format=json";
 
 @interface ILBitly()
 
 - (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt;
+- (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
 
 @end
 
@@ -55,6 +59,24 @@ static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&f
 	[super dealloc];
 }
 
+- (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt {
+	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+	NSString *status = [bundle localizedStringForKey:bitlyStatusTxt value:bitlyStatusTxt table:@"ILBitlyErrors"];
+	
+	return status;
+}
+
+- (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status {
+	NSMutableDictionary *userDict = [NSMutableDictionary dictionary];
+	status = [self localizedStatusText:status];
+	if(status)
+		[userDict setObject:status forKey:NSLocalizedDescriptionKey];
+	NSError *bitlyError = [NSError errorWithDomain:kILBitlyErrorDomain code:code userInfo:userDict];
+	
+	return bitlyError;
+}
+
+#pragma mark - URL shortening
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/shorten
 
 - (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result {
@@ -74,13 +96,8 @@ static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&f
 				result([json valueForKeyPath:@"data.url"]);
 		}
 		else {
-			NSDictionary *userDict = [NSDictionary dictionaryWithObject:[self localizedStatusText:statusText]
-																 forKey:NSLocalizedDescriptionKey];
-			NSError *bitlyError = [NSError errorWithDomain:@"com.bitly.error"
-														code:[statusCode integerValue] 
-													userInfo:userDict];
 			if(error)
-				error(bitlyError);
+				error([self errorWithCode:[statusCode integerValue] status:statusText]);
 			else if(result)
 				result(nil);
 		}
@@ -93,11 +110,49 @@ static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&f
 	[_queue addOperation:operation];
 }
 
-- (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt {
-	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-	NSString *status = [bundle localizedStringForKey:bitlyStatusTxt value:bitlyStatusTxt table:@"ILBitlyErrors"];
-	
-	return status;
+#pragma mark - URL expanding
+// Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/expand
+
+- (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result {
+	[self expand:shortURLString result:result error:nil];
+}
+
+- (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result error:(void (^)(NSError*))error {
+	NSString *escString = [shortURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	NSString *urlString = [NSString stringWithFormat:kExpandURL, _auth, escString];
+	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+
+	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
+		NSNumber *statusCode = [json valueForKeyPath:@"status_code"];
+		NSString *statusText = [json valueForKeyPath:@"status_txt"];
+		if(([statusCode intValue] == 200) && [statusText isEqualToString:@"OK"]) {
+			if(result) {
+				id entry = [[[json valueForKeyPath:@"data.expand"] objectEnumerator] nextObject];
+				NSString *longUrl = [entry valueForKey:@"long_url"];
+				if(longUrl) {
+					result(longUrl);
+				}
+				else {
+					if(error)
+						error([self errorWithCode:-1 status:[entry valueForKey:@"error"]]);
+					else
+						result(nil);
+				}
+			}
+		}
+		else {
+			if(error)
+				error([self errorWithCode:[statusCode integerValue] status:statusText]);
+			else if(result)
+				result(nil);
+		}
+	} failure:^(NSError *err) {
+		if(error)
+			error(err);
+		else if(result)
+			result(nil);
+	}];
+	[_queue addOperation:operation];
 }
 
 @end

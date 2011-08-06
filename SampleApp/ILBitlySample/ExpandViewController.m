@@ -1,8 +1,8 @@
 //
-//  ShortenViewController.m
+//  ExpandViewController.m
 //  ILBitlySample
 //
-//  Created by Claus Broch on 04/08/11.
+//  Created by Claus Broch on 07/08/11.
 //  Copyright 2011 Infinite Loop. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without modification, are permitted
@@ -26,22 +26,39 @@
 //  WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#import "ShortenViewController.h"
+#import "ExpandViewController.h"
 #import "ILBitly.h"
 
-@interface ShortenViewController()
-- (void)shorten:(NSString*)text;
+@interface ExpandViewController()
+- (void)expand:(NSString*)text;
 @end
 
-@implementation ShortenViewController
+@implementation ExpandViewController
 
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad
+- (void)didReceiveMemoryWarning
 {
-    [super viewDidLoad];
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    
+    // Release any cached data, images, etc that aren't in use.
 }
-*/
+
+#pragma mark - View lifecycle
+
+- (void)viewDidUnload
+{
+    [shortUrlField release];
+    shortUrlField = nil;
+    [expandedUrlField release];
+    expandedUrlField = nil;
+    [errorField release];
+    errorField = nil;
+    [reasonField release];
+    reasonField = nil;
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -49,38 +66,17 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc. that aren't in use.
-}
-
-- (void)viewDidUnload
-{
-    [longUrlField release];
-    longUrlField = nil;
-	[shortUrl release];
-	shortUrl = nil;
-	[errorCode release];
-	errorCode = nil;
-	[errorReason release];
-	errorReason = nil;
-    [super viewDidUnload];
-}
-
 - (void)dealloc {
-    [longUrlField release];
-	[shortUrl release];
-	[errorCode release];
-	[errorReason release];
+    [shortUrlField release];
+    [expandedUrlField release];
+    [errorField release];
+    [reasonField release];
     [super dealloc];
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
-	if(textField == longUrlField) {
-		[self shorten:textField.text];
+	if(textField == shortUrlField) {
+		[self expand:textField.text];
 	}
 }
 
@@ -89,18 +85,18 @@
     return NO;
 }
 
-- (void)shorten:(NSString*)text {
+- (void)expand:(NSString*)text {
 	NSString *login = [[NSUserDefaults standardUserDefaults] objectForKey:@"login"];
 	NSString *apiKey = [[NSUserDefaults standardUserDefaults] objectForKey:@"apiKey"];
 	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
-	[bitly shorten:text result:^(NSString *shortURLString) {
-		shortUrl.text = shortURLString;
-		errorCode.text = @"";
-		errorReason.text = @"";
+	[bitly expand:text result:^(NSString *longURLString) {
+		expandedUrlField.text = longURLString;
+		errorField.text = @"";
+		reasonField.text = @"";
 	} error:^(NSError *err) {
-		shortUrl.text = @"";
-		errorCode.text = [NSString stringWithFormat:@"%d", [err code]];
-		errorReason.text = [err localizedDescription];
+		expandedUrlField.text = @"";
+		errorField.text = [NSString stringWithFormat:@"%d", [err code]];
+		reasonField.text = [err localizedDescription];
 	}];
 	[bitly release];
 }
