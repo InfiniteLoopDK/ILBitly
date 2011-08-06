@@ -7,6 +7,10 @@
 
 /* NOT_FOUND */
 "NOT_FOUND" = "The item could not be found.";
+/* Error 500 - INVALID_LOGIN */
+"INVALID_LOGIN" = "Invalid username provided.";
+/* Error 500 - INVALID_LOGIN */
+"INVALID_APIKEY" = "Invalid API Key provided.";
 /* Error 500 - MISSING_ARG_URI */
 "MISSING_ARG_URI" = "Missing argument: uri";
 /* Error 500 - MISSING_ARG_LOGIN */
