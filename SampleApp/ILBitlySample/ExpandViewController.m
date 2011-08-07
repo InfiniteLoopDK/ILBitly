@@ -30,6 +30,7 @@
 #import "ILBitly.h"
 
 @interface ExpandViewController()
+- (void)clicks:(NSString*)text;
 - (void)expand:(NSString*)text;
 @end
 
@@ -55,6 +56,8 @@
     errorField = nil;
     [reasonField release];
     reasonField = nil;
+    [clicksField release];
+    clicksField = nil;
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -71,6 +74,7 @@
     [expandedUrlField release];
     [errorField release];
     [reasonField release];
+    [clicksField release];
     [super dealloc];
 }
 
@@ -85,16 +89,36 @@
     return NO;
 }
 
-- (void)expand:(NSString*)text {
+- (void)clicks:(NSString*)text {
 	NSString *login = [[NSUserDefaults standardUserDefaults] objectForKey:@"login"];
 	NSString *apiKey = [[NSUserDefaults standardUserDefaults] objectForKey:@"apiKey"];
 	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
-	[bitly expand:text result:^(NSString *longURLString) {
-		expandedUrlField.text = longURLString;
+	[bitly clicks:text result:^(NSInteger userClicks, NSInteger globalClicks) {
+		clicksField.text = [NSString stringWithFormat:@"%d of %d", userClicks, globalClicks];
 		errorField.text = @"";
 		reasonField.text = @"";
 	} error:^(NSError *err) {
+		clicksField.text = @"";
+		errorField.text = [NSString stringWithFormat:@"%d", [err code]];
+		reasonField.text = [err localizedDescription];
+	}];
+	[bitly release];
+}
+
+
+- (void)expand:(NSString*)shortURLString {
+	NSString *login = [[NSUserDefaults standardUserDefaults] objectForKey:@"login"];
+	NSString *apiKey = [[NSUserDefaults standardUserDefaults] objectForKey:@"apiKey"];
+	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
+	[bitly expand:shortURLString result:^(NSString *longURLString) {
+		expandedUrlField.text = longURLString;
+		clicksField.text = @"...";
+		errorField.text = @"";
+		reasonField.text = @"";
+		[self performSelectorOnMainThread:@selector(clicks:) withObject:shortURLString waitUntilDone:NO];
+	} error:^(NSError *err) {
 		expandedUrlField.text = @"";
+		clicksField.text = @"";
 		errorField.text = [NSString stringWithFormat:@"%d", [err code]];
 		reasonField.text = [err localizedDescription];
 	}];

@@ -32,6 +32,7 @@
 	
 	IBOutlet UITextField *shortUrlField;
 	IBOutlet UITextView *expandedUrlField;
+	IBOutlet UILabel *clicksField;
 	IBOutlet UILabel *errorField;
 	IBOutlet UILabel *reasonField;
 }

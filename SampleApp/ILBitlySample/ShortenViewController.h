@@ -32,6 +32,7 @@
 	
 	IBOutlet UITextField *longUrlField;
 	IBOutlet UILabel *shortUrl;
+	IBOutlet UILabel *clicksField;
 	IBOutlet UILabel *errorCode;
 	IBOutlet UILabel *errorReason;
 }

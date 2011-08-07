@@ -30,6 +30,7 @@
 #import "ILBitly.h"
 
 @interface ShortenViewController()
+- (void)clicks:(NSString*)text;
 - (void)shorten:(NSString*)text;
 @end
 
@@ -67,6 +68,8 @@
 	errorCode = nil;
 	[errorReason release];
 	errorReason = nil;
+    [clicksField release];
+    clicksField = nil;
     [super viewDidUnload];
 }
 
@@ -75,6 +78,7 @@
 	[shortUrl release];
 	[errorCode release];
 	[errorReason release];
+    [clicksField release];
     [super dealloc];
 }
 
@@ -89,16 +93,35 @@
     return NO;
 }
 
-- (void)shorten:(NSString*)text {
+- (void)clicks:(NSString*)text {
 	NSString *login = [[NSUserDefaults standardUserDefaults] objectForKey:@"login"];
 	NSString *apiKey = [[NSUserDefaults standardUserDefaults] objectForKey:@"apiKey"];
 	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
-	[bitly shorten:text result:^(NSString *shortURLString) {
-		shortUrl.text = shortURLString;
+	[bitly clicks:text result:^(NSInteger userClicks, NSInteger globalClicks) {
+		clicksField.text = [NSString stringWithFormat:@"%d of %d", userClicks, globalClicks];
 		errorCode.text = @"";
 		errorReason.text = @"";
 	} error:^(NSError *err) {
+		clicksField.text = @"";
+		errorCode.text = [NSString stringWithFormat:@"%d", [err code]];
+		errorReason.text = [err localizedDescription];
+	}];
+	[bitly release];
+}
+
+- (void)shorten:(NSString*)longURLString {
+	NSString *login = [[NSUserDefaults standardUserDefaults] objectForKey:@"login"];
+	NSString *apiKey = [[NSUserDefaults standardUserDefaults] objectForKey:@"apiKey"];
+	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
+	[bitly shorten:longURLString result:^(NSString *shortURLString) {
+		shortUrl.text = shortURLString;
+		clicksField.text = @"...";
+		errorCode.text = @"";
+		errorReason.text = @"";
+		[self performSelectorOnMainThread:@selector(clicks:) withObject:shortURLString waitUntilDone:NO];
+	} error:^(NSError *err) {
 		shortUrl.text = @"";
+		clicksField.text = @"";
 		errorCode.text = [NSString stringWithFormat:@"%d", [err code]];
 		errorReason.text = [err localizedDescription];
 	}];

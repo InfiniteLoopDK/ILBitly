@@ -47,14 +47,10 @@
 
 /** Takes a long URL and returns a shortened version of it.
  
- Takes the long URL specfied in _longURLString_ and returns a shortened version in the block specified in _result_. 
- @param longURLString The long URL string to shorten
- @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value*/
-- (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result;
-
-/** Takes a long URL and returns a shortened version of it.
+ Takes the long URL specfied in _longURLString_ and returns a shortened version in the block specified in _result_.
  
- Takes the long URL specfied in _longURLString_ and returns a shortened version in the block specified in _result_. In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
+ In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
+
  @param longURLString The long URL string to shorten
  @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value
  @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
@@ -65,17 +61,24 @@
 /** Takes a short URL and returns an expanded version of it.
  
  Takes the short URL specfied in _shortURLString_ and returns an expanded version in the block specified in _result_. 
- @param shortURLString The short URL string to expand
- @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value*/
-- (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result;
-
-/** Takes a short URL and returns an expanded version of it.
  
- Takes the short URL specfied in _shortURLString_ and returns an expanded version in the block specified in _result_.  In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
+ In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
  @param shortURLString The short URL string to expand
  @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value
  @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
 - (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result error:(void (^)(NSError*))error;
+
+/** @name Statistics */
+
+/** Provides statistics about the numbers of clicks on a short URL.
+ 
+ Takes the short URL specfied in _shortURLString_ and returns statistics about the number of clicks in the block specified in _result_. The value in _userClicks_ contains the count of clicks on this user's bitly link. The value in _globalClicks_ contains total count of clicks to all bitly links that point to the same same long URL.
+ 
+ In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
+ @param shortURLString The short URL string to expand
+ @param result The block to execute upon success. The block should take two NSInteger parameters and have no return value.
+ @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
+- (void)clicks:(NSString*)shortURLString result:(void (^)(NSInteger userClicks, NSInteger globalClicks))result error:(void (^)(NSError*))error;
 
 @end
 

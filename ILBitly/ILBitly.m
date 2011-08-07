@@ -32,6 +32,7 @@ NSString *const kILBitlyErrorDomain = @"ILBitlyErrorDomain";
 
 static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&format=json";
 static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&format=json";
+static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&format=json";
 
 @interface ILBitly()
 
@@ -77,15 +78,13 @@ static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&fo
 }
 
 #pragma mark - URL shortening
+
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/shorten
 
-- (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result {
-	[self shorten:longURLString result:result error:nil];
-}
-
 - (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result error:(void (^)(NSError*))error {
-	NSString *escString = [longURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)longURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kShortenURL, _auth, escString];
+	CFRelease(escString);
 	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
 	
 	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
@@ -111,15 +110,13 @@ static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&fo
 }
 
 #pragma mark - URL expanding
+
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/expand
 
-- (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result {
-	[self expand:shortURLString result:result error:nil];
-}
-
 - (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result error:(void (^)(NSError*))error {
-	NSString *escString = [shortURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)shortURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kExpandURL, _auth, escString];
+	CFRelease(escString);
 	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
 
 	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
@@ -151,6 +148,50 @@ static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&fo
 			error(err);
 		else if(result)
 			result(nil);
+	}];
+	[_queue addOperation:operation];
+}
+
+#pragma mark - Statistics
+
+// Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/clicks
+
+- (void)clicks:(NSString*)shortURLString result:(void (^)(NSInteger userClicks, NSInteger globalClicks))result error:(void (^)(NSError*))error {
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)shortURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
+	NSString *urlString = [NSString stringWithFormat:kClicksURL, _auth, escString];
+	CFRelease(escString);
+	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+	
+	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
+		NSNumber *statusCode = [json valueForKeyPath:@"status_code"];
+		NSString *statusText = [json valueForKeyPath:@"status_txt"];
+		if(([statusCode intValue] == 200) && [statusText isEqualToString:@"OK"]) {
+			if(result) {
+				id entry = [[[json valueForKeyPath:@"data.clicks"] objectEnumerator] nextObject];
+				NSNumber *userClicks = [entry valueForKey:@"user_clicks"];
+				NSNumber *globalClicks = [entry valueForKey:@"global_clicks"];
+				if(userClicks && globalClicks) {
+					result([userClicks integerValue], [globalClicks integerValue]);
+				}
+				else {
+					if(error)
+						error([self errorWithCode:-1 status:[entry valueForKey:@"error"]]);
+					else
+						result(-1, -1);
+				}
+			}
+		}
+		else {
+			if(error)
+				error([self errorWithCode:[statusCode integerValue] status:statusText]);
+			else if(result)
+				result(-1, -1);
+		}
+	} failure:^(NSError *err) {
+		if(error)
+			error(err);
+		else if(result)
+			result(-1, -1);
 	}];
 	[_queue addOperation:operation];
 }

@@ -21,13 +21,18 @@ For the sample project to build, you need to place AFNetworking and JSONKit insi
 	[bitly release];
 
 ###Expanding an URL
-	ILBitly *bitly = [[ILBitly alloc] initWithLogin:login apiKey:apiKey];
 	[bitly expand:@"http://j.mp/its-your-round" result:^(NSString *longURLString) {
 		NSLog(@"The expanded URL: %@", longURLString);
 	} error:^(NSError *err) {
 		NSLog(@"An error occurred %@", err);
 	}];
-	[bitly release];
+
+###Getting statistics on number of clicks
+	[bitly clicks:@"http://j.mp/qnpNBs" result:^(NSInteger userClicks, NSInteger globalClicks) {
+		NSLog(@"This link has been clicked %d times out of %d clicks globally: %d", userClicks, globalClicks);
+	} error:^(NSError *err) {
+		NSLog(@"An error occurred %@", err);
+	}];
 
 
 See more examples in the attached sample project.
