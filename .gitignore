@@ -12,5 +12,6 @@ xcuserdata
 # 3rd party stuff
 3rdParty/AFNetworking
 3rdParty/JSONKit
+3rdParty/OCMock
 
 
