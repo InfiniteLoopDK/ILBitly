@@ -38,6 +38,7 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 
 - (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt;
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
+- (NSURLRequest*)requestForURLString:(NSString*)urlString;
 
 @end
 
@@ -77,6 +78,11 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 	return bitlyError;
 }
 
+- (NSURLRequest*)requestForURLString:(NSString*)urlString {
+	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+	return request;
+}
+
 #pragma mark - URL shortening
 
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/shorten
@@ -85,7 +91,7 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)longURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kShortenURL, _auth, escString];
 	CFRelease(escString);
-	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+	NSURLRequest *request = [self requestForURLString:urlString];
 	
 	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
 		NSNumber *statusCode = [json valueForKeyPath:@"status_code"];
@@ -117,7 +123,7 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)shortURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kExpandURL, _auth, escString];
 	CFRelease(escString);
-	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+	NSURLRequest *request = [self requestForURLString:urlString];
 
 	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
 		NSNumber *statusCode = [json valueForKeyPath:@"status_code"];
@@ -160,7 +166,7 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)shortURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kClicksURL, _auth, escString];
 	CFRelease(escString);
-	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+	NSURLRequest *request = [self requestForURLString:urlString];
 	
 	AFJSONRequestOperation *operation = [AFJSONRequestOperation operationWithRequest:request success:^(id json) {
 		NSNumber *statusCode = [json valueForKeyPath:@"status_code"];
