@@ -6,9 +6,12 @@ ILBitly provides an Objective C wrapper class for accessing the free URL shorten
 
 - [AFNetworking](https://github.com/gowalla/AFNetworking) - Used for the underlying network access
 - [JSONKit](https://github.com/johnezang/JSONKit) - Needed for parsing the response from bit.ly
+- [OCMock](http://ocmock.org) - Only needed for running the unit tests
 - You will also need an account at bit.ly including an [API key](http://bitly.com/a/your_api_key)
 
 For the sample project to build, you need to place AFNetworking and JSONKit inside the folder called 3rdParty.
+
+If you also intense to run the unit tests you will need to download the latest version of OCMock (1.77 or newer), unpack it and place it in the 3rdParty folder. You may need to remove the version from the folder name so it's just called OCMock.
 
 ## Example Usage
 ###Shortening an URL
