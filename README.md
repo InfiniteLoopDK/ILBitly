@@ -11,7 +11,7 @@ ILBitly provides an Objective C wrapper class for accessing the free URL shorten
 
 For the sample project to build, you need to place AFNetworking and JSONKit inside the folder called 3rdParty.
 
-If you also intense to run the unit tests you will need to download the latest version of OCMock (1.77 or newer), unpack it and place it in the 3rdParty folder. You may need to remove the version from the folder name so it's just called OCMock.
+If you also intend to run the unit tests you will need to download the latest version of OCMock (1.77 or newer), unpack it and place it in the 3rdParty folder. You may need to remove the version from the folder name so it's just called OCMock.
 
 ## Example Usage
 ###Shortening an URL
