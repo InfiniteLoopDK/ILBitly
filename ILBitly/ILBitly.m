@@ -31,6 +31,8 @@
 NSString *const kILBitlyErrorDomain = @"ILBitlyErrorDomain";
 NSString *const kILBitlyStatusTextKey = @"ILBitlyStatusText";
 
+static CFStringRef const kILBitlyIllegalCharacters = CFSTR("!*'();:@&=+$,/?#[]");
+
 static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&format=json";
 static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&format=json";
 static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&format=json";
@@ -93,7 +95,7 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 
 - (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result error:(void (^)(NSError*))error {
 	NSString *trimmedLongURLString = [longURLString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)trimmedLongURLString, nil, CFSTR("!*'();:@&=+$,/?#[]"), kCFStringEncodingUTF8);
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)trimmedLongURLString, nil, kILBitlyIllegalCharacters, kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kShortenURL, _auth, escString];
 	CFRelease(escString);
 	NSURLRequest *request = [self requestForURLString:urlString];
@@ -125,7 +127,8 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/expand
 
 - (void)expand:(NSString*)shortURLString result:(void (^)(NSString *longURLString))result error:(void (^)(NSError*))error {
-	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)shortURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
+	NSString *trimmedShortURLString = [shortURLString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)trimmedShortURLString, nil, kILBitlyIllegalCharacters, kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kExpandURL, _auth, escString];
 	CFRelease(escString);
 	NSURLRequest *request = [self requestForURLString:urlString];
@@ -168,7 +171,8 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/clicks
 
 - (void)clicks:(NSString*)shortURLString result:(void (^)(NSInteger userClicks, NSInteger globalClicks))result error:(void (^)(NSError*))error {
-	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)shortURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
+	NSString *trimmedShortURLString = [shortURLString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)trimmedShortURLString, nil, kILBitlyIllegalCharacters, kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kClicksURL, _auth, escString];
 	CFRelease(escString);
 	NSURLRequest *request = [self requestForURLString:urlString];
