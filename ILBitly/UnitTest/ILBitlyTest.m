@@ -166,4 +166,105 @@
 	[bitlyMock verify];
 }
 
+- (void)testExpand {
+	// Prepare the canned test result
+	[ILCannedURLProtocol setCannedResponseData:[self cannedDataWithName:@"expand"]];
+	[ILCannedURLProtocol setCannedHeaders:[NSDictionary dictionaryWithObject:@"application/json; charset=utf-8" forKey:@"Content-Type"]];
+	bitlyMock = [OCMockObject partialMockForObject:bitly];
+	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
+	 requestForURLString:[OCMArg checkWithBlock:^(id url) {
+		return [url isEqualToString:@"http://api.bitly.com/v3/expand?login=LOGIN&apiKey=KEY&shortUrl=http%3A%2F%2Fj.mp%2Fits-your-round&format=json"]; 
+	}]];
+	
+	// Execute the code under test
+	[bitly expand:@"http://j.mp/its-your-round" result:^(NSString *longURLString) {
+		STAssertEqualObjects(longURLString, @"http://itunes.apple.com/us/app/its-your-round/id448750786?mt=8&uo=4", @"Unexpected long url");
+		done = YES;
+	} error:^(NSError *err) {
+		STFail(@"Expand failed with error: %@", [err localizedDescription]);
+		done = YES;
+	}];
+	
+	// Verify the result
+	STAssertTrue([self waitForCompletion:5.0], @"Expand didn't complete within expected time");
+	[bitlyMock verify];
+}
+
+- (void)testExpandNotFound {
+	// Prepare the canned test result
+	[ILCannedURLProtocol setCannedResponseData:[self cannedDataWithName:@"expand+notfound"]];
+	[ILCannedURLProtocol setCannedHeaders:[NSDictionary dictionaryWithObject:@"application/json; charset=utf-8" forKey:@"Content-Type"]];
+	bitlyMock = [OCMockObject partialMockForObject:bitly];
+	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
+	 requestForURLString:[OCMArg checkWithBlock:^(id url) {
+		return [url isEqualToString:@"http://api.bitly.com/v3/expand?login=LOGIN&apiKey=KEY&shortUrl=http%3A%2F%2Fj.mp%2Fdoesnt-exist&format=json"]; 
+	}]];
+	
+	// Execute the code under test
+	[bitly expand:@"http://j.mp/doesnt-exist" result:^(NSString *longURLString) {
+		STFail(@"Should have failed with not found");
+		done = YES;
+	} error:^(NSError *err) {
+		STAssertEquals([err code], -1, @"Unexpected error code");
+		STAssertEqualObjects([err domain], kILBitlyErrorDomain, @"Unexpected error domain");
+		STAssertEqualObjects([[err userInfo] objectForKey:kILBitlyStatusTextKey], @"NOT_FOUND", @"Unexpected error status");
+		done = YES;
+	}];
+	
+	// Verify the result
+	STAssertTrue([self waitForCompletion:5.0], @"Expand didn't complete within expected time");
+	[bitlyMock verify];
+}
+
+- (void)testExpandInvalidKey {
+	// Prepare the canned test result
+	[ILCannedURLProtocol setCannedResponseData:[self cannedDataWithName:@"expand+badkey"]];
+	[ILCannedURLProtocol setCannedHeaders:[NSDictionary dictionaryWithObject:@"application/json; charset=utf-8" forKey:@"Content-Type"]];
+	bitlyMock = [OCMockObject partialMockForObject:bitly];
+	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
+	 requestForURLString:[OCMArg checkWithBlock:^(id url) {
+		return [url isEqualToString:@"http://api.bitly.com/v3/expand?login=LOGIN&apiKey=KEY&shortUrl=http%3A%2F%2Fj.mp%2Fits-your-round&format=json"]; 
+	}]];
+	
+	// Execute the code under test
+	[bitly expand:@"http://j.mp/its-your-round" result:^(NSString *longURLString) {
+		STFail(@"Should have failed with invalid apikey");
+		done = YES;
+	} error:^(NSError *err) {
+		STAssertEquals([err code], 500, @"Unexpected error code");
+		STAssertEqualObjects([err domain], kILBitlyErrorDomain, @"Unexpected error domain");
+		STAssertEqualObjects([[err userInfo] objectForKey:kILBitlyStatusTextKey], @"INVALID_APIKEY", @"Unexpected error status");
+		done = YES;
+	}];
+	
+	// Verify the result
+	STAssertTrue([self waitForCompletion:5.0], @"Expand didn't complete within expected time");
+	[bitlyMock verify];
+}
+
+- (void)testExpandTimeout {
+	// Prepare the canned test result
+	[ILCannedURLProtocol setCannedError:[NSError errorWithDomain:NSURLErrorDomain code:kCFURLErrorTimedOut userInfo:nil]];
+	bitlyMock = [OCMockObject partialMockForObject:bitly];
+	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
+	 requestForURLString:[OCMArg checkWithBlock:^(id url) {
+		return [url isEqualToString:@"http://api.bitly.com/v3/expand?login=LOGIN&apiKey=KEY&shortUrl=http%3A%2F%2Fj.mp%2Fits-your-round&format=json"]; 
+	}]];
+	
+	// Execute the code under test
+	[bitly expand:@"http://j.mp/its-your-round" result:^(NSString *longURLString) {
+		STFail(@"Should have failed with timeout");
+		done = YES;
+	} error:^(NSError *err) {
+		STAssertEquals([err code], kCFURLErrorTimedOut, @"Unexpected error code");
+		STAssertEqualObjects([err domain], NSURLErrorDomain, @"Unexpected error domain");
+		done = YES;
+	}];
+	
+	// Verify the result
+	STAssertTrue([self waitForCompletion:5.0], @"Expand didn't complete within expected time");
+	[bitlyMock verify];
+}
+
+
 @end
