@@ -55,11 +55,15 @@
 	
 	[NSURLProtocol registerClass:[ILCannedURLProtocol class]];
 	[ILCannedURLProtocol setCannedStatusCode:200];
+	[ILCannedURLProtocol setCannedHeaders:nil];
+	[ILCannedURLProtocol setCannedResponseData:nil];
 }
 
 - (void)tearDown
 {
 	[NSURLProtocol unregisterClass:[ILCannedURLProtocol class]];
+	[ILCannedURLProtocol setCannedHeaders:nil];
+	[ILCannedURLProtocol setCannedResponseData:nil];
 	
     [bitly release];
 	bitlyMock = nil;
@@ -130,6 +134,30 @@
 		STAssertEquals([err code], 403, @"Unexpected error code");
 		STAssertEqualObjects([err domain], kILBitlyErrorDomain, @"Unexpected error domain");
 		STAssertEqualObjects([[err userInfo] objectForKey:kILBitlyStatusTextKey], @"RATE_LIMIT_EXCEEDED", @"Unexpected error status");
+		done = YES;
+	}];
+	
+	// Verify the result
+	STAssertTrue([self waitForCompletion:5.0], @"Shorten didn't complete within expected time");
+	[bitlyMock verify];
+}
+
+- (void)testShortenTimeout {
+	// Prepare the canned test result
+	[ILCannedURLProtocol setCannedError:[NSError errorWithDomain:NSURLErrorDomain code:kCFURLErrorTimedOut userInfo:nil]];
+	bitlyMock = [OCMockObject partialMockForObject:bitly];
+	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
+	 requestForURLString:[OCMArg checkWithBlock:^(id url) {
+		return [url isEqualToString:@"http://api.bitly.com/v3/shorten?login=LOGIN&apiKey=KEY&longUrl=http%3A%2F%2Fwww.infinite-loop.dk%2Fblog&format=json"]; 
+	}]];
+	
+	// Execute the code under test
+	[bitly shorten:@"http://www.infinite-loop.dk/blog" result:^(NSString *shortURLString) {
+		STFail(@"Should have failed with timeout");
+		done = YES;
+	} error:^(NSError *err) {
+		STAssertEquals([err code], kCFURLErrorTimedOut, @"Unexpected error code");
+		STAssertEqualObjects([err domain], NSURLErrorDomain, @"Unexpected error domain");
 		done = YES;
 	}];
 	

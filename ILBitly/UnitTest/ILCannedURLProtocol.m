@@ -35,6 +35,7 @@
 static NSData *gILCannedResponseData = nil;
 static NSDictionary *gILCannedHeaders = nil;
 static NSInteger gILCannedStatusCode = 200;
+static NSError *gILCannedError = nil;
 
 @implementation ILCannedURLProtocol
 
@@ -65,23 +66,38 @@ static NSInteger gILCannedStatusCode = 200;
 	gILCannedStatusCode = 200;
 }
 
++ (void)setCannedError:(NSError*)error {
+	if(error != gILCannedError) {
+		[gILCannedError release];
+		gILCannedError = [error retain];
+	}
+}
+
 - (NSCachedURLResponse *)cachedResponse {
 	return nil;
 }
 
 - (void)startLoading {
-    NSURLRequest *request = [self request];	
-	NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:[request URL]
-															  statusCode:gILCannedStatusCode
-															   headerFields:gILCannedHeaders 
-															 requestTime:0.0];
-
-    id<NSURLProtocolClient> client = [self client];
-	[client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
-	[client URLProtocol:self didLoadData:gILCannedResponseData];
-	[client URLProtocolDidFinishLoading:self];
+    NSURLRequest *request = [self request];
+	id<NSURLProtocolClient> client = [self client];
 	
-	[response release];
+	if(gILCannedResponseData) {
+		// Send the canned data
+		NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:[request URL]
+																  statusCode:gILCannedStatusCode
+																headerFields:gILCannedHeaders 
+																 requestTime:0.0];
+		
+		[client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+		[client URLProtocol:self didLoadData:gILCannedResponseData];
+		[client URLProtocolDidFinishLoading:self];
+		
+		[response release];
+	}
+	else if(gILCannedError) {
+		// Send the canned error
+		[client URLProtocol:self didFailWithError:gILCannedError];
+	}
 }
 
 - (void)stopLoading {

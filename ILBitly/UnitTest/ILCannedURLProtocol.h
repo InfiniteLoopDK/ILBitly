@@ -32,5 +32,6 @@
 + (void)setCannedResponseData:(NSData*)data;
 + (void)setCannedHeaders:(NSDictionary*)headers;
 + (void)setCannedStatusCode:(NSInteger)statusCode;
++ (void)setCannedError:(NSError*)error;
 
 @end
