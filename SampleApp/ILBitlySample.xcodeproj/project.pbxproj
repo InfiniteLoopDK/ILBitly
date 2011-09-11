@@ -51,6 +51,8 @@
 		6AFE12F1141964C000633AF2 /* ILBitly.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFEEAFB13EB03190030660F /* ILBitly.m */; };
 		6AFE12F314198A2C00633AF2 /* shorten.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AFE12F214198A2C00633AF2 /* shorten.json */; };
 		6AFE12F6141B5B1F00633AF2 /* ILCannedURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFE12F5141B5B1F00633AF2 /* ILCannedURLProtocol.m */; };
+		6AFE12FD141CC42100633AF2 /* shorten+limit.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AFE12FC141CC42100633AF2 /* shorten+limit.json */; };
+		6AFE12FE141CC64100633AF2 /* ILBitlyErrors.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6A11A7B013EDFF45001B0548 /* ILBitlyErrors.strings */; };
 		6AFEEAFC13EB03190030660F /* ILBitly.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFEEAFB13EB03190030660F /* ILBitly.m */; };
 		6AFEEB8B13EB5B230030660F /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFEEB8213EB5AD80030660F /* JSONKit.m */; };
 		6AFEEB8C13EB5B2D0030660F /* AFJSONRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AFEEB3113EB5AD80030660F /* AFJSONRequestOperation.m */; };
@@ -95,6 +97,7 @@
 		6AFE12F214198A2C00633AF2 /* shorten.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = shorten.json; sourceTree = "<group>"; };
 		6AFE12F4141B5B1F00633AF2 /* ILCannedURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ILCannedURLProtocol.h; sourceTree = "<group>"; };
 		6AFE12F5141B5B1F00633AF2 /* ILCannedURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ILCannedURLProtocol.m; sourceTree = "<group>"; };
+		6AFE12FC141CC42100633AF2 /* shorten+limit.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shorten+limit.json"; sourceTree = "<group>"; };
 		6AFEEAF813EAFFAA0030660F /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		6AFEEAF913EAFFC00030660F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		6AFEEAFA13EB03190030660F /* ILBitly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ILBitly.h; sourceTree = "<group>"; };
@@ -210,7 +213,7 @@
 				6AB6F642141947690044C906 /* ILBitlyTest.m */,
 				6AFE12F4141B5B1F00633AF2 /* ILCannedURLProtocol.h */,
 				6AFE12F5141B5B1F00633AF2 /* ILCannedURLProtocol.m */,
-				6AFE12F214198A2C00633AF2 /* shorten.json */,
+				6AFE12FB141CC1A900633AF2 /* Test Data */,
 			);
 			path = UnitTest;
 			sourceTree = "<group>";
@@ -261,6 +264,15 @@
 				6A147C3513E9FF91000750C2 /* SettingsView.xib */,
 			);
 			name = Settings;
+			sourceTree = "<group>";
+		};
+		6AFE12FB141CC1A900633AF2 /* Test Data */ = {
+			isa = PBXGroup;
+			children = (
+				6AFE12F214198A2C00633AF2 /* shorten.json */,
+				6AFE12FC141CC42100633AF2 /* shorten+limit.json */,
+			);
+			name = "Test Data";
 			sourceTree = "<group>";
 		};
 		6AFEEAED13EAFB8B0030660F /* ILBitly */ = {
@@ -404,6 +416,8 @@
 			files = (
 				6AB6F638141946C80044C906 /* InfoPlist.strings in Resources */,
 				6AFE12F314198A2C00633AF2 /* shorten.json in Resources */,
+				6AFE12FD141CC42100633AF2 /* shorten+limit.json in Resources */,
+				6AFE12FE141CC64100633AF2 /* ILBitlyErrors.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

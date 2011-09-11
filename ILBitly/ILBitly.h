@@ -83,3 +83,4 @@
 @end
 
 extern NSString *const kILBitlyErrorDomain;
+extern NSString *const kILBitlyStatusTextKey;

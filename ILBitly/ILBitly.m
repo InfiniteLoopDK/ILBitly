@@ -29,6 +29,7 @@
 #import "AFJSONRequestOperation.h"
 
 NSString *const kILBitlyErrorDomain = @"ILBitlyErrorDomain";
+NSString *const kILBitlyStatusTextKey = @"ILBitlyStatusText";
 
 static NSString *kShortenURL = @"http://api.bitly.com/v3/shorten?%@&longUrl=%@&format=json";
 static NSString *kExpandURL = @"http://api.bitly.com/v3/expand?%@&shortUrl=%@&format=json";
@@ -70,6 +71,7 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status {
 	NSMutableDictionary *userDict = [NSMutableDictionary dictionary];
+	[userDict setObject:status forKey:kILBitlyStatusTextKey];
 	status = [self localizedStatusText:status];
 	if(status)
 		[userDict setObject:status forKey:NSLocalizedDescriptionKey];

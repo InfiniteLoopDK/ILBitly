@@ -112,4 +112,30 @@
 	[bitlyMock verify];
 }
 
+- (void)testShortenRateLimit {
+	// Prepare the canned test result
+	[ILCannedURLProtocol setCannedResponseData:[self cannedDataWithName:@"shorten+limit"]];
+	[ILCannedURLProtocol setCannedHeaders:[NSDictionary dictionaryWithObject:@"application/json; charset=utf-8" forKey:@"Content-Type"]];
+	bitlyMock = [OCMockObject partialMockForObject:bitly];
+	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
+	 requestForURLString:[OCMArg checkWithBlock:^(id url) {
+		return [url isEqualToString:@"http://api.bitly.com/v3/shorten?login=LOGIN&apiKey=KEY&longUrl=http%3A%2F%2Fwww.infinite-loop.dk%2Fblog&format=json"]; 
+	}]];
+	
+	// Execute the code under test
+	[bitly shorten:@"http://www.infinite-loop.dk/blog" result:^(NSString *shortURLString) {
+		STFail(@"Should have failed with rate limit");
+		done = YES;
+	} error:^(NSError *err) {
+		STAssertEquals([err code], 403, @"Unexpected error code");
+		STAssertEqualObjects([err domain], kILBitlyErrorDomain, @"Unexpected error domain");
+		STAssertEqualObjects([[err userInfo] objectForKey:kILBitlyStatusTextKey], @"RATE_LIMIT_EXCEEDED", @"Unexpected error status");
+		done = YES;
+	}];
+	
+	// Verify the result
+	STAssertTrue([self waitForCompletion:5.0], @"Shorten didn't complete within expected time");
+	[bitlyMock verify];
+}
+
 @end
