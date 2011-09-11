@@ -95,11 +95,11 @@
 	bitlyMock = [OCMockObject partialMockForObject:bitly];
 	[[[bitlyMock expect] andReturn:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://"]]]
 									requestForURLString:[OCMArg checkWithBlock:^(id url) {
-		return [url isEqualToString:@"http://api.bitly.com/v3/shorten?login=LOGIN&apiKey=KEY&longUrl=http://www.infinite-loop.dk/&format=json"]; 
+		return [url isEqualToString:@"http://api.bitly.com/v3/shorten?login=LOGIN&apiKey=KEY&longUrl=http%3A%2F%2Fwww.infinite-loop.dk%2Fblog%2F%3Fa%3D1%26b%3D2%23with%20spaces&format=json"]; 
 	}]];
 	 
 	// Execute the code under test
-	[bitly shorten:@"http://www.infinite-loop.dk/" result:^(NSString *shortURLString) {
+	[bitly shorten:@" http://www.infinite-loop.dk/blog/?a=1&b=2#with spaces " result:^(NSString *shortURLString) {
 		STAssertEqualObjects(shortURLString, @"http://j.mp/qA7S4Q", @"Unexpected short url");
 		done = YES;
 	} error:^(NSError *err) {

@@ -85,10 +85,13 @@ static NSString *kClicksURL = @"http://api.bitly.com/v3/clicks?%@&shortUrl=%@&fo
 
 #pragma mark - URL shortening
 
+
+
 // Request formatted according to http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/shorten
 
 - (void)shorten:(NSString*)longURLString result:(void (^)(NSString *shortURLString))result error:(void (^)(NSError*))error {
-	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)longURLString, nil, CFSTR("?&"), kCFStringEncodingUTF8);
+	NSString *trimmedLongURLString = [longURLString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	CFStringRef escString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)trimmedLongURLString, nil, CFSTR("!*'();:@&=+$,/?#[]"), kCFStringEncodingUTF8);
 	NSString *urlString = [NSString stringWithFormat:kShortenURL, _auth, escString];
 	CFRelease(escString);
 	NSURLRequest *request = [self requestForURLString:urlString];
