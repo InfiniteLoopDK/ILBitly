@@ -362,6 +362,7 @@
 		6A147C0A13E9FF90000750C2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastUpgradeCheck = 0410;
 				ORGANIZATIONNAME = "Infinite Loop";
 			};
 			buildConfigurationList = 6A147C0D13E9FF90000750C2 /* Build configuration list for PBXProject "ILBitlySample" */;
@@ -613,11 +614,15 @@
 					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
 					"\"$(SRCROOT)/../3rdParty/OCMock/Release/\"",
 				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "UnitTest/UnitTest-Prefix.pch";
+				GCC_VERSION = 4.2;
 				INFOPLIST_FILE = "UnitTest/UnitTest-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
+					"-lgcov",
 					"-ObjC",
 					"-force_load",
 					"\"$(SRCROOT)/../3rdParty/OCMock/Release/Library/libOCMock.a\"",
@@ -635,11 +640,15 @@
 					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
 					"\"$(SRCROOT)/../3rdParty/OCMock/Release/\"",
 				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "UnitTest/UnitTest-Prefix.pch";
+				GCC_VERSION = 4.2;
 				INFOPLIST_FILE = "UnitTest/UnitTest-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
+					"-lgcov",
 					"-ObjC",
 					"-force_load",
 					"\"$(SRCROOT)/../3rdParty/OCMock/Release/Library/libOCMock.a\"",
