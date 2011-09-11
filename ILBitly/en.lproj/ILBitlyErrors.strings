@@ -7,6 +7,8 @@
 
 /* NOT_FOUND */
 "NOT_FOUND" = "The item could not be found.";
+/* Error 403 - RATE_LIMIT_EXCEEDED */
+"RATE_LIMIT_EXCEEDED" = "Rate limit is exceeded.";
 /* Error 500 - INVALID_LOGIN */
 "INVALID_LOGIN" = "Invalid username provided.";
 /* Error 500 - INVALID_LOGIN */
