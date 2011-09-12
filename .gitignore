@@ -1,0 +1,17 @@
+# Xcode noise
+build
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.xcworkspace
+xcuserdata
+
+# OS X noise
+.DS_Store
+
+# 3rd party stuff
+3rdParty/AFNetworking
+3rdParty/JSONKit
+3rdParty/OCMock
+
+

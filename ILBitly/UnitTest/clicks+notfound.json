@@ -1,0 +1,1 @@
+{"status_code": 200, "data": {"clicks": [{"short_url": "http://bit.ly/doesnt-exist", "error": "NOT_FOUND"}]}, "status_txt": "OK"}

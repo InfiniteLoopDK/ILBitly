@@ -1,0 +1,21 @@
+/* 
+  ILBitlyErrors.strings
+
+  Created by Claus Broch on 07/08/11.
+  Copyright 2011 Infinite Loop. All rights reserved.
+*/
+
+/* NOT_FOUND */
+"NOT_FOUND" = "The item could not be found.";
+/* Error 403 - RATE_LIMIT_EXCEEDED */
+"RATE_LIMIT_EXCEEDED" = "Rate limit is exceeded.";
+/* Error 500 - INVALID_LOGIN */
+"INVALID_LOGIN" = "Invalid username provided.";
+/* Error 500 - INVALID_LOGIN */
+"INVALID_APIKEY" = "Invalid API Key provided.";
+/* Error 500 - MISSING_ARG_URI */
+"MISSING_ARG_URI" = "Missing argument: uri";
+/* Error 500 - MISSING_ARG_LOGIN */
+"MISSING_ARG_LOGIN" = "Missing argument: login";
+/* Error 500 - MISSING_ARG_APIKEY */
+"MISSING_ARG_APIKEY" = "Missing argument: apikey";
