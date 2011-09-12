@@ -57,6 +57,7 @@
 	[ILCannedURLProtocol setCannedStatusCode:200];
 	[ILCannedURLProtocol setCannedHeaders:nil];
 	[ILCannedURLProtocol setCannedResponseData:nil];
+	[ILCannedURLProtocol setCannedError:nil];
 }
 
 - (void)tearDown
@@ -64,6 +65,7 @@
 	[NSURLProtocol unregisterClass:[ILCannedURLProtocol class]];
 	[ILCannedURLProtocol setCannedHeaders:nil];
 	[ILCannedURLProtocol setCannedResponseData:nil];
+	[ILCannedURLProtocol setCannedError:nil];
 	
     [bitly release];
 	bitlyMock = nil;
